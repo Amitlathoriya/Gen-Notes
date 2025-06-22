@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 import main  # assumes main.py has download_subtitles
 # import card  # assumes card.py has generate_flashcards_from_txt
 import os
+from yt_dlp.utils import DownloadError
 
 app = FastAPI()
 
@@ -22,10 +23,18 @@ def read_root():
 
 @app.post("/generate-notes")
 def generate_notes(youtube_url: str = Form(...)):
-    notes = main.download_subtitles(youtube_url)
-    if notes:
-        return {"notes": notes}
-    return JSONResponse(status_code=500, content={"error": "Failed to generate notes."})
+    try:
+        notes = main.download_subtitles(youtube_url)
+        if notes:
+            return {"notes": notes}
+        # This will now handle cases where subtitles are not found
+        return JSONResponse(status_code=404, content={"error": "Could not find subtitles for this video."})
+    except DownloadError as e:
+        # This will catch errors like "Video unavailable"
+        return JSONResponse(status_code=400, content={"error": "Video is unavailable or region-locked."})
+    except Exception as e:
+        # Catch any other unexpected errors
+        return JSONResponse(status_code=500, content={"error": "An unexpected error occurred."})
 
 # @app.post("/generate-flashcards")
 # def generate_flashcards(notes: str = Form(...)):
