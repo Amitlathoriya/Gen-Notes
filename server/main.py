@@ -48,6 +48,7 @@ def download_subtitles(URL):
         print('Downloading regular subtitles...')
         with YoutubeDL(ydl_opts) as ydl:
             ydl.download([URL])
+            
     # If no regular subtitles, try auto-generated
     elif 'en' in auto_subs and auto_subs['en']:
         ydl_opts = {
