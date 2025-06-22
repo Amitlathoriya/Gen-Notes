@@ -70,12 +70,11 @@ def download_subtitles(URL):
     if os.path.exists(srt_filename):
         print(f"Subtitles saved as: {srt_filename}")
         notes = generate_notes_from_vtt(srt_filename, video_title)
-        notes_filename = f"{video_title}_notes.txt"
-        with open(notes_filename, 'w', encoding='utf-8') as f:
-            f.write(notes)
-        print(f"Notes generated and saved as: {notes_filename}")
+        os.remove(srt_filename) # Clean up the subtitle file
+        return notes
     else:
         print("Subtitle file not found after download.")
+        return None
 
 # Example usage
 if __name__ == "__main__":
